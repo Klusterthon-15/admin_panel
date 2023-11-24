@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import {useAuthContext} from './useAuthContext'
 import { useNavigate } from 'react-router-dom'
 import { AlertContext } from '../context/AlertContext';
+import { baseUrl } from "../Data";
 
 export const useLogin = () =>{
     const [isLoading, setIsLoading] = useState(false)
@@ -12,7 +13,7 @@ export const useLogin = () =>{
     const login = async (email, password) => {
         setIsLoading(true)
 
-        const response = await fetch('https://fantastick-api.vercel.app/api/user/login', {
+        const response = await fetch(`${baseUrl}/health_provider/auth/login`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email, password})
@@ -21,7 +22,7 @@ export const useLogin = () =>{
 
         if(!response.ok){
             setIsLoading(false)
-            showAlert("error", json.error)
+            showAlert("error", json.status)
         }
         if(response.ok) {
             localStorage.setItem('user', JSON.stringify(json))

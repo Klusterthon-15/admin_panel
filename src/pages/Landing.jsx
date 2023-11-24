@@ -21,11 +21,12 @@ export default function Landing() {
       <nav className='landing_nav'>
         <a className='home_link'>
           <img className="logo" src="/logo.png" alt="" /> 
-          <h1><span>Klust</span>Medics</h1> 
+          <h1>KlustMedics</h1> 
         </a>
         <div className='landing_links'>
-          <div className="nav_login" onClick={()=>navigate('/login')} tabIndex={2}>Login As a Provider</div>
-          <div className="nav_signup" onClick={()=>navigate('/signup')} tabIndex={1}>Download the app</div>
+          {/* <div className="nav_login" onClick={()=>navigate('/login')} tabIndex={2}>Login As a Provider</div> */}
+          <div className="nav_signup" onClick={()=>navigate('/')} tabIndex={1}>Download the client app</div>
+          <div className="nav_login" onClick={()=>navigate('/signup')} tabIndex={2}>Register as a Provider</div>
           {/* <div className="nav_signup" onClick={()=>navigate('/signup')} tabIndex={1}>Signup</div> */}
         </div>
       </nav>
@@ -37,8 +38,8 @@ export default function Landing() {
           <p>Klust Medics is a groundbreaking digital solution that revolutionizes medication management for patients with long-term health conditions.</p>
           {/* <p>Our intuitive platform empowers both healthcare professionals and patients to work together seamlessly, fostering improved health outcomes and reduced healthcare costs</p> */}
           <div id='cta_btns'>
-            <button className="hero_signup" onClick={()=>navigate('/signup')}>Get Started<FaArrowRightLong className='right_icon'/></button>
-            <button className="hero_login" onClick={()=>navigate('/login')}>Login</button>
+            <button className="hero_login" onClick={()=>navigate('/login')}>Login as a Provider</button>
+            <button className="hero_signup" onClick={()=>navigate('/')}>Get Started<FaArrowRightLong className='right_icon'/></button>
           </div>
         </div>
         <img className='landing_img' src="/landing_img.jpg" alt="smiling doctor with his laptop" />

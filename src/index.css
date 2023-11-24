@@ -38,7 +38,7 @@ a{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 60px;
+    gap: 30px;
 }
 .nav_signup{
     background: var(--primary);
@@ -251,6 +251,7 @@ a{
     align-items: center;
     gap: 4px;
     margin-bottom: 10px;
+    width: 100%;
 }
 .logout_btn:hover, .nav_items>a:hover{
     background-color: #c2e7ff;
@@ -297,10 +298,78 @@ a{
     color: var(--primary);
     font-family: var(--primary-font);
     animation: fade 0.5s;
+    font-size: 1.4em;
 }
 .dash_section{
     width: 100%;
+    animation: fade-down 0.3s;
     /* min-height: calc(100vh - 120px); */
+}
+.dashBanner{
+    width: calc(100% - 30px);
+    border-radius: 20px;
+    background: var(--primary);
+    color: #fff;
+    height: 120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+.dash_report{
+    width: calc(100% - 30px);
+    border-radius: 20px;
+    background: #fff;
+    height: 180px;
+    padding: 15px;
+    margin-top: 15px;
+    box-shadow: 0 0 11px rgba(0, 0, 0, 0.219);
+    border-radius: 10px;
+}
+.dash_text> h3{
+    font-size: 2em;
+    margin-block: 10px;
+}
+.dash_text{
+    height: 100%;
+
+}
+.dash_stats{
+    width: 100%;
+    display: flex;
+    height: 160px;
+    gap: 15px;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+.dash_stats> div{
+    background: #fff;
+    box-shadow: 0 0 11px rgba(56, 56, 56, 0.219);
+    border-radius: 10px;
+    width: 100%;
+    text-align: center;
+}
+.stat_big{
+    font-size: 2.7em;
+    font-weight: 600;
+    color: #3e3e3e;
+    margin-bottom: 15px;
+}
+.stat_big> svg{
+    color: var(--primary);
+    margin: 0 8px -8px 0px;
+}
+.dashBanner> img{
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+}
+.add_patient{
+    cursor: pointer;
+    transition: 0.2s;
+}
+.add_patient:hover{
+    scale: 1.02;
 }
 .main> .section{
     padding: 20px;
@@ -579,7 +648,7 @@ a{
 .form_headings{
     margin: 0 0 5px 0;
     font-size: 2.5em;
-    color: #07330b;
+    color: #070e33;
     animation: fade-up 0.8s;
 }
 .signup_field{
