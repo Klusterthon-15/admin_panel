@@ -9,6 +9,7 @@ import Alert from '../components/Alert';
 import { AlertContext } from '../context/AlertContext';
 import SelectedPatient from '../components/SelectedPatient';
 import { baseUrl } from "../Data";
+import { ItemsContext } from '../context/ItemContext';
 
 export default function Patients(props) {
 
@@ -17,6 +18,9 @@ export default function Patients(props) {
   const [ isLoading, setIsLoading ] = useState(false)
   const [ isError, setIsError ] = useState(false)
   const [patients, setPatients] = useState([]);
+  const [cachedPatients, setCachedPatients] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { dispatch } = useContext(ItemsContext);
   
   useEffect(()=>{
     const fetchItems = async () => {
@@ -38,51 +42,26 @@ export default function Patients(props) {
 
       const json = await response.json();
       setPatients(json.data);
+      setCachedPatients(json.data)
     }
 
 
     if(user){
-    // showAlert("loading", "Loading...")
     fetchItems()
-    console.log(patients)
   }
   
   }, [user])
   
-  // const handleSubmit = async (e) =>{
-  //   e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const filteredPatients = cachedPatients.filter((patient) => {
+      return patient.full_name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
-  //   if(!user){
-  //       showAlert("error", "You must be logged in!")
-  //       return
-  //   } else{
-  //       showAlert("loading", "Please wait...")
-  //       setIsLoading(true);
-  //   }
-  //   const res = await fetch(`${baseUrl}/health_provider/patients/add_patient`, {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //           "full_name":fullname, 
-  //           email, 
-  //           "health_condition":healthCondition, 
-  //           "phone_number":phoneNumber, 
-  //           "date_of_birth":dob, 
-  //           gender
-  //       }),
-  //       headers: {
-  //           'Content-Type': 'application/json',
-  //           'Authorization': `Bearer ${user.data.token}`
-  //       }
-  //   })
-  //   const json = await res.json();
-  //   if(!res.ok){
-  //       showAlert("error", json.status)
-  //       setIsLoading(false);
-  //   }
-  //   if(res.ok){
-  //       props.handleClick()
-  //   }
-  // }
+    setPatients(filteredPatients);
+  };
+
+
   return (
     <div className='home'>
       <style>
@@ -96,9 +75,10 @@ export default function Patients(props) {
       <div className='main'>
         <h1>Patients</h1>
         <section className='section'>
-          <form className="patients_search" onSubmit={{}}>
-              <input type="search" placeholder='Search Patients'/>
-              <input type="submit" value="Go!" />
+          <form className="patients_search" onSubmit={handleSubmit}>
+            <input type="search" placeholder='Search Patient Names' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input type="submit" value="Go!" />
+            <button className='clear_search'>Clear</button>
           </form>
           <hr />
           {
@@ -110,7 +90,11 @@ export default function Patients(props) {
         <    p>Oops! Something went wrong. <br />Check your Network and try again!</p></div> 
       :<div className='main'></div>}
               <div className="all_patients_wrapper">
-                {patients && patients.map((obj) => <div className='patient_wrapper'><p>{obj.full_name}</p> </div>)}
+              {patients && patients.map((obj) => (
+                <div onClick={() => dispatch({ type: 'SET_SELECTED_PATIENT', payload:obj._id })} className='patient_wrapper' key={obj._id}>
+                  <p>{obj.full_name}</p>
+                </div>
+              ))}
               </div>
         </section>
       </div>

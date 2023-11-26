@@ -401,14 +401,15 @@ a{
     margin-top: 6px;
     display: flex;
     /* justify-content: space-between; */
-    gap: 20px;
+    gap: 10px;
 }
-.patients_search>input{
+.patients_search>input, .clear_search{
     padding: 10px 10px 8px 10px;
     border-radius: 6px;
     border: none;
     transition: 0.2s;
     font-family: var(--primary-font);
+    font-weight: 700;
 }
 .patients_search>input:first-of-type{
     border-bottom: 2px solid transparent;
@@ -418,6 +419,22 @@ a{
 }.patients_search>input:first-of-type:focus{
     border-bottom: 2px solid #0e529f;
     outline: 0;
+}
+.patients_search>input:last-of-type, .clear_search{
+    background: rgb(211, 211, 211);
+    cursor: pointer;
+    transition: 0.2s;
+    width: 70px;
+}
+.patients_search>input:last-of-type:hover{
+    background: rgb(186, 186, 186);
+}
+.clear_search{
+    border: 0;
+    background: rgb(86, 4, 4);
+    color: #fff;
+}.clear_search:hover{
+    background: rgb(57, 3, 3);
 }
 .section> hr{
     margin-block: 20px;

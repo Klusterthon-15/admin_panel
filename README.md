@@ -1,6 +1,5 @@
 <div  align="center">
-  <img src="https://github.com/Topman-14/FantasTick/assets/98329531/b8f4075e-d750-4687-8ad9-bde6f6504679" >
-  <h1>FantasTick</h1>
+  
   <p>
     Welcome to the FantasTick Todo App! This application is your ultimate companion in managing tasks and staying organized, Whether you're a productivity enthusiast, a student juggling multiple assignments, or anyone who loves tracking accomplishments, FantasTick is the CRUD app for you.
   </p>
