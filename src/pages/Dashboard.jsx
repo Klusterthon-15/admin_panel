@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useEffect, useContext } from "react"
 import { useItemsContext } from '../hooks/useItemsContext';
 import { useAuthContext } from '../hooks/useAuthContext';
@@ -9,38 +9,45 @@ import Alert from '../components/Alert';
 import { AlertContext } from '../context/AlertContext';
 import SelectedPatient from '../components/SelectedPatient';
 import { IoPersonCircle, IoAddCircle  } from "react-icons/io5";
+import { MdOutlineErrorOutline } from "react-icons/md";
 import { baseUrl } from "../Data";
 
 export default function Dashboard(props) {
 
-  const {items, dispatch} = useItemsContext()
+  // const {items, dispatch} = useItemsContext()
   const { user } = useAuthContext();
   const {showAlert} = useContext(AlertContext);
-  console.log(user.data.token)
+  const [ isLoading, setIsLoading ] = useState(false)
+  const [ isError, setIsError ] = useState(false)
   
   useEffect(()=>{
     const fetchItems = async () => {
-      const response = await fetch(`${baseUrl}/health_provider/patients/get_patients/`, {
+      setIsLoading(true)
+      const response = await fetch(`${baseUrl}/health_provider/patients/get_patients/100`, {
         headers: {
           'Authorization': `Bearer ${user.data.token}`
         }
       })
-      const json = await response.json();
+      
       if(response.ok){
-        dispatch({type: 'SET_ITEMS', payload: json})
-        console.log("workinggggg")
+        setIsLoading(false)
+        setIsError(false)
       } else{
-        console.log('Bros, this network is not networking')
+        setIsLoading(false)
+        setIsError(true)
+        showAlert("error", "Network Error!")
       }
+
+      const json = await response.json();
     }
 
 
     if(user){
-    showAlert("loading", "Loading...")
+    // showAlert("loading", "Loading...")
     fetchItems()
   }
   
-  }, [user, dispatch])
+  }, [user])
   
   return (
     <div className='home'>
@@ -52,7 +59,14 @@ export default function Dashboard(props) {
       </style>
       <Navbar handleClick={props.handleClick}/>
 
-      <div className='main'>
+      {isLoading? <div className='dash_loader'><img src='/loader.svg' alt=""/></div> 
+      : isError? <div className='dash_err'> 
+        <p className="err_logo">
+          <MdOutlineErrorOutline/> 
+        </p>
+        <p>Oops! Something went wrong. <br />Check your Network and try again!</p>
+      </div> 
+      :<div className='main'>
         <h1>Dashboard</h1>
         <section className='dash_section'>
           <div className="dashBanner">
@@ -71,7 +85,7 @@ export default function Dashboard(props) {
             <p className='stat_big'><IoPersonCircle />12</p>
               <p className='stat_small'>Assigned Patients</p>
             </div>
-            <div className="add_patient">
+            <div className="add_patient" onClick={props.handleClick} >
             <p className='stat_big'><IoAddCircle /><br /></p>
               <p className='stat_small'>Add Patient</p>
             </div>
@@ -80,7 +94,7 @@ export default function Dashboard(props) {
 
           </div>
         </section>
-      </div>
+      </div>}
       <SelectedPatient />
       {/* {items && <h1>Welcome { user && user.username.charAt(0).toUpperCase() + user.username.slice(1)}, You have {items.length > 0? items.length : "no" } {items.length > 1? "items" : "item"} in your list!</h1>}
 
