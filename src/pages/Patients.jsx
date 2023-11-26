@@ -1,15 +1,12 @@
 import React, { useState } from 'react'
 import { useEffect, useContext } from "react"
-import { useItemsContext } from '../hooks/useItemsContext';
 import { useAuthContext } from '../hooks/useAuthContext';
-import Item from "../components/Item";
 import Navbar from '../components/Navbar'
-import { HiPlus } from "react-icons/hi";
-import Alert from '../components/Alert';
 import { AlertContext } from '../context/AlertContext';
 import SelectedPatient from '../components/SelectedPatient';
 import { baseUrl } from "../Data";
 import { ItemsContext } from '../context/ItemContext';
+import { MdOutlineErrorOutline } from 'react-icons/md';
 
 export default function Patients(props) {
 
@@ -47,7 +44,13 @@ export default function Patients(props) {
 
 
     if(user){
-    fetchItems()
+      try{
+        fetchItems()
+      }catch(e){
+        setIsLoading(false)
+        setIsError(true)
+        showAlert("error", "Network Error!")
+      }
   }
   
   }, [user])
@@ -61,6 +64,13 @@ export default function Patients(props) {
     setPatients(filteredPatients);
   };
 
+  const loadingBlock = <div className='dash_loader'><img src='/loader.svg' alt=""/></div>
+  const errorBlock = <div className='dash_err'> <p className="err_logo"> <MdOutlineErrorOutline/> </p> <p>Oops! Something went wrong. <br />Check your Network and try again!</p></div>
+
+  const clearForm = () =>{
+    setSearchTerm("");
+    handleSubmit;
+  }
 
   return (
     <div className='home'>
@@ -78,24 +88,18 @@ export default function Patients(props) {
           <form className="patients_search" onSubmit={handleSubmit}>
             <input type="search" placeholder='Search Patient Names' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             <input type="submit" value="Go!" />
-            <button className='clear_search'>Clear</button>
+            <button className='clear_search' onClick={clearForm}>Clear</button>
           </form>
           <hr />
-          {
-          isLoading? <div className='dash_loader'><img src='/loader.svg' alt=""/></div> 
-          : isError? <div className='dash_err'> 
-            <p className="err_logo">
-              <MdOutlineErrorOutline/> 
-            </p>
-        <    p>Oops! Something went wrong. <br />Check your Network and try again!</p></div> 
-      :<div className='main'></div>}
+          { isLoading? loadingBlock : isError? errorBlock :
               <div className="all_patients_wrapper">
-              {patients && patients.map((obj) => (
-                <div onClick={() => dispatch({ type: 'SET_SELECTED_PATIENT', payload:obj._id })} className='patient_wrapper' key={obj._id}>
-                  <p>{obj.full_name}</p>
-                </div>
-              ))}
-              </div>
+                  {patients && patients.map((obj) => (
+                  <div onClick={() => dispatch({ type: 'SET_SELECTED_PATIENT', payload:obj._id })} className='patient_wrapper' key={obj._id}>
+                    <p>{obj.full_name}</p>
+                    <p className="patient_verify_badge" style={!obj.verified? {background: "rgb(242, 70, 7)"} : {background: "rgb(14, 205, 7)",}}>{obj.verified? "Verified" : "Not Verified"}</p>
+                  </div>
+                ))}
+              </div>}
         </section>
       </div>
       <SelectedPatient />
