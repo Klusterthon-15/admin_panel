@@ -25,7 +25,7 @@ export default function Landing() {
         </a>
         <div className='landing_links'>
           {/* <div className="nav_login" onClick={()=>navigate('/login')} tabIndex={2}>Login As a Provider</div> */}
-          <div className="nav_signup" onClick={()=>navigate('/')} tabIndex={1}>Download the client app</div>
+          <a target="_blank" href="https://drive.google.com/file/d/1eiEFImn0tz5SjSCL_7UPqJHeILO5JIeK/view" className="nav_signup" onClick={()=>navigate('/')} tabIndex={1}>Download the client app</a>
           <div className="nav_login" onClick={()=>navigate('/signup')} tabIndex={2}>Register as a Provider</div>
           {/* <div className="nav_signup" onClick={()=>navigate('/signup')} tabIndex={1}>Signup</div> */}
         </div>
@@ -39,7 +39,7 @@ export default function Landing() {
           {/* <p>Our intuitive platform empowers both healthcare professionals and patients to work together seamlessly, fostering improved health outcomes and reduced healthcare costs</p> */}
           <div id='cta_btns'>
             <button className="hero_login" onClick={()=>navigate('/login')}>Login as a Provider</button>
-            <button className="hero_signup" onClick={()=>navigate('/')}>Get Started<FaArrowRightLong className='right_icon'/></button>
+            <a  target="_blank" href="https://drive.google.com/file/d/1eiEFImn0tz5SjSCL_7UPqJHeILO5JIeK/view" className="hero_signup" >Get Started<FaArrowRightLong className='right_icon'/></a>
           </div>
         </div>
         <img className='landing_img' src="/landing_img.jpg" alt="smiling doctor with his laptop" />

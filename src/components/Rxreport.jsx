@@ -2,10 +2,11 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { IoRemoveCircleOutline } from "react-icons/io5";
 import { AlertContext } from '../context/AlertContext';
+import { baseUrl } from '../Data';
 
-const Rsreport = ({patientId}) => {
-    console.log(patientId)
+const Rxreport = ({patientId}) => {
     const { user } = useAuthContext();
+    const { showAlert } = useContext(AlertContext);
     const [isLoading, setIsLoading] = useState(false)
     const [isError, setIsError] = useState(false)
     const [meds, setMeds] = useState([])
@@ -13,15 +14,14 @@ const Rsreport = ({patientId}) => {
     const fetchMeds = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`${baseUrl}/patient/medication/get_medication/${patientId}`, {
+            const response = await fetch(`${baseUrl}/health_provider/medications/get_medications/${patientId}`, {
               headers: {
                 Authorization: `Bearer ${user.data.token}`,
               },
             });
-  
+            const json = await response.json();
+            
             if (response.ok) {
-              const json = await response.json();
-              console.log(json.data)
               if(json.data){
                 setMeds(json.data);
               }
@@ -46,11 +46,11 @@ const Rsreport = ({patientId}) => {
                 <h2>Rx Report</h2>
                 {(meds.length !== 0) && <button type='button'>Print</button>}
             </div>
-            {/* {meds && meds.map(med => <div key={med._id}> <p>{med.name}</p></div>)}
-            {(meds.length == 0) && <div style={{textAlign:"center"}}><p className='err_logo'><IoRemoveCircleOutline  /></p><p>No Medications Added yet</p></div>} */}
+            {meds && meds.map(med => <div key={med._id}> <p>{med.name}</p></div>)}
+            {(meds.length == 0) && <div style={{textAlign:"center"}}><p className='err_logo'><IoRemoveCircleOutline  /></p><p>No Medications Added yet</p></div>}
             <div className='dummy'>
                 <h2>85%</h2>
-                <p>Adherence</p>
+                <p>Overall Adherence</p>
             </div>
             <h2>Regimen</h2>
             <p>Insulin 500mg 2x daily</p>
@@ -58,4 +58,4 @@ const Rsreport = ({patientId}) => {
         </section> 
     );}
 
-export default Rsreport;
+export default Rxreport;
