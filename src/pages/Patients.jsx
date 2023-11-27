@@ -18,30 +18,29 @@ export default function Patients(props) {
   const [cachedPatients, setCachedPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const { dispatch } = useContext(ItemsContext);
-  
-  useEffect(()=>{
-    const fetchItems = async () => {
-      setIsLoading(true)
-      const response = await fetch(`${baseUrl}/health_provider/patients/get_patients/100`, {
-        headers: {
-          'Authorization': `Bearer ${user.data.token}`
-        }
-      })
-      
-      if(response.ok){
-        setIsLoading(false)
-        setIsError(false)
-      } else{
-        setIsLoading(false)
-        setIsError(true)
-        showAlert("error", "Network Error!")
-      }
 
-      const json = await response.json();
-      setPatients(json.data);
-      setCachedPatients(json.data)
+  const fetchItems = async () => {
+    setIsLoading(true)
+    const response = await fetch(`${baseUrl}/health_provider/patients/get_patients/100`, {
+      headers: {
+        'Authorization': `Bearer ${user.data.token}`
+      }
+    })
+    
+    if(response.ok){
+      setIsLoading(false)
+      setIsError(false)
+    } else{
+      setIsLoading(false)
+      setIsError(true)
+      showAlert("error", "Network Error!")
     }
 
+    const json = await response.json();
+    setPatients(json.data);
+    setCachedPatients(json.data)
+  }
+  useEffect(()=>{
 
     if(user){
       try{
@@ -51,6 +50,8 @@ export default function Patients(props) {
         setIsError(true)
         showAlert("error", "Network Error!")
       }
+  } else{
+    showAlert("error", "Please Login!")
   }
   
   }, [user])
@@ -94,7 +95,7 @@ export default function Patients(props) {
           { isLoading? loadingBlock : isError? errorBlock :
               <div className="all_patients_wrapper">
                   {patients && patients.map((obj) => (
-                  <div onClick={() => dispatch({ type: 'SET_SELECTED_PATIENT', payload:obj._id })} className='patient_wrapper' key={obj._id}>
+                  <div onClick={() => dispatch({ type: 'SET_SELECTED_PATIENT', payload: obj._id })} className='patient_wrapper' key={obj._id}>
                     <p>{obj.full_name}</p>
                     <p className="patient_verify_badge" style={!obj.verified? {background: "rgb(242, 70, 7)"} : {background: "rgb(14, 205, 7)",}}>{obj.verified? "Verified" : "Not Verified"}</p>
                   </div>
@@ -102,7 +103,7 @@ export default function Patients(props) {
               </div>}
         </section>
       </div>
-      <SelectedPatient />
+      <SelectedPatient handleUpdate={()=> fetchItems()}/>
     </div>
   )
 }

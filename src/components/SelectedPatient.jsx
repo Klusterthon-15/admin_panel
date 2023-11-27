@@ -1,63 +1,274 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { useAuthContext } from '../hooks/useAuthContext'
+import React, { useState, useContext, useEffect } from 'react';
+import { useAuthContext } from '../hooks/useAuthContext';
 import { ItemsContext } from '../context/ItemContext';
-import { baseUrl } from "../Data";
+import { AlertContext } from '../context/AlertContext';
+import { baseUrl } from '../Data';
 import { MdOutlineErrorOutline } from 'react-icons/md';
 
-export default function SelectedPatient(props) {
-  const { patientId } = useContext(ItemsContext); 
-  const {user} = useAuthContext();
-  const [ isLoading, setIsLoading ] = useState(false)
-  const [ isError, setIsError ] = useState(false)
-  const [patient, setPatient] = useState({})
+export default function SelectedPatient({handleUpdate}) {
+  const { patientId } = useContext(ItemsContext);
+  const { user } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [patient, setPatient] = useState({});
+  const { showAlert } = useContext(AlertContext);
 
-  useEffect(()=>{
+  const [fullname, setFullname] = useState('');
+  const [email, setEmail] = useState('');
+  const [healthCondition, setHealthCondition] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [dob, setDob] = useState('');
+  const [gender, setGender] = useState('');
+  const [readOnly, setReadOnly] = useState(true);
+  const [isLoading2, setIsLoading2] = useState(false);
+
+  useEffect(() => {
+    const selectedPatient = JSON.parse(localStorage.getItem('selectedPatient'));
+
     const fetchItems = async () => {
-      setIsLoading(true)
-      const response = await fetch(`${baseUrl}/health_provider/patients/get_patient/${patientId}`, {
-        headers: {
-          'Authorization': `Bearer ${user.data.token}`
-        }
-      })
-      
-      if(response.ok){
-        setIsLoading(false)
-        setIsError(false)
-      } else{
-        setIsLoading(false)
-        setIsError(true)
-        showAlert("error", "Network Error!")
-      }
+      try {
+          setIsLoading(true);
+          const response = await fetch(`${baseUrl}/health_provider/patients/get_patient/${patientId}`, {
+            headers: {
+              Authorization: `Bearer ${user.data.token}`,
+            },
+          });
 
-      const json = await response.json();
-      setPatient(json.data);
+          if (response.ok) {
+            const json = await response.json();
+            localStorage.setItem('selectedPatient', JSON.stringify(json));
+            setPatient(json.data);
+            setIsLoading(false);
+            setIsError(false);
+            setFullname(json.data.full_name || '');
+            setEmail(json.data.email || '');
+            setHealthCondition(json.data.health_condition || '');
+            setPhoneNumber(json.data.phone_number || '');
+            setDob(json.data.date_of_birth || '');
+            setGender(json.data.gender || '');
+          } 
+        } catch (error) {
+          setIsLoading(false);
+          console.log(error)
+          setIsError(true);
+          showAlert('error', 'An error occurred while fetching patient information');
+        }
+    };
+    console.log(selectedPatient.data._id, patientId)
+
+    if (patientId && selectedPatient.data._id !== patientId) {
+      fetchItems();
+      setReadOnly(true)
+    } else {
+      setPatient(selectedPatient.data)
+      setFullname((selectedPatient.data.full_name) || '');
+      setEmail((selectedPatient.data.email) || '');
+      setHealthCondition((selectedPatient.data.health_condition) || '');
+      setPhoneNumber((selectedPatient.data.phone_number) || '');
+      setDob((selectedPatient.data.date_of_birth) || '');
+      setGender((selectedPatient.data.gender) || '');
     }
 
-    if(patientId){
-    fetchItems()
+  }, [user, patientId]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (!user) {
+      showAlert('error', 'You must be logged in!');
+      return;
+    } else {
+      showAlert('loading', 'Please wait...');
+      setIsLoading2(true);
+    }
+    console.log(fullname, healthCondition, phoneNumber);
+  
+    try {
+      const formData = new FormData();
+      formData.append('full_name', fullname);
+      formData.append('email', email);
+      formData.append('date_of_birth', dob);
+      formData.append('gender', gender);
+      formData.append('health_condition', healthCondition);
+      formData.append('phone_number', phoneNumber);
+  
+      const res = await fetch(`${baseUrl}/health_provider/patients/edit_patient/${patientId || patient._id}`, {
+        method: 'PATCH',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${user.data.token}`,
+        },
+      });
+  
+      const json = await res.json();
+      if (!res.ok) {
+        showAlert('error', json.status);
+        setIsLoading2(false);
+      }
+      if (res.ok) {
+        setIsLoading2(false);
+        setReadOnly(true);
+        showAlert('', 'Patient updated successfully!');
+        const selectedPatient = JSON.parse(localStorage.getItem('selectedPatient'));
+        if(handleUpdate){handleUpdate()};
+        localStorage.setItem('selectedPatient', JSON.stringify({
+          ...selectedPatient,
+          full_name: fullname,
+          email,
+          date_of_birth: dob,
+          gender,
+          health_condition: healthCondition,
+          phone_number: phoneNumber,
+        }));
+      }
+    } catch (error) {
+      setIsLoading2(false);
+      console.log(error);
+      showAlert('error', 'An error occurred while updating patient information');
+    }
+  };
+  function cancelUpdate(){
+    setReadOnly(true)
+    const selectedPatient = JSON.parse(localStorage.getItem('selectedPatient'));
+    setPatient(selectedPatient.data)
+    setFullname((selectedPatient.data.full_name) || '');
+    setEmail((selectedPatient.data.email) || '');
+    setHealthCondition((selectedPatient.data.health_condition) || '');
+    setPhoneNumber((selectedPatient.data.phone_number) || '');
+    setDob((selectedPatient.data.date_of_birth) || '');
+    setGender((selectedPatient.data.gender) || '');
   }
   
-  }, [user, patientId])
-
-  const loadingBlock = <div className='dash_loader'><img src='/loader.svg' alt=""/></div>
-  const errorBlock = <div className='dash_err'> <p className="err_logo"> <MdOutlineErrorOutline/> </p> <p>Oops! Something went wrong. <br />Check your Network and try again!</p></div>
-
   return (
-      <div className='nav_main select_patient'>
-        {isLoading? loadingBlock : isError? errorBlock: 
-        <div className="select_p_wrap">
-          <p>{patient.full_name}</p>
-          <p>{patient.date_of_birth}</p>
-          <p>{patient.email}</p>
-          <p>{patient.phone_number}</p>
-          <p>{patient.phone_number}</p>
+    <div className='nav_main select_patient'>
+      {isLoading ? (
+        <div className='dash_loader'>
+          <img src='/loader.svg' alt='' />
         </div>
-      }
-      </div>
-  )
-}
+      ) : isError ? (
+        <div className='dash_err'>
+          <p className='err_logo'>
+            <MdOutlineErrorOutline />
+          </p>
+          <p>
+            Oops! Something went wrong. <br /> Check your Network and try again!
+          </p>
+        </div>
+      ) : (<div className='select_patient_body'>
+        <form className='select_patient_form' onSubmit={handleSubmit}>
+          <div className='update_p_header'>
+          <h2>Patient details</h2>
+          </div>
+          {/* <hr /> */}
+          <div className="update_p_inputs">
+            <label htmlFor='title'>Name</label>
+            <input
+              className='update_patient'
+              type='text'
+              onChange={(e) => setFullname(e.target.value)}
+              value={fullname}
+              readOnly={readOnly} 
+              style={readOnly? {border:"none", textAlign:"right", fontSize:"1em", padding: "0", background: "transparent"} : {}}
+            />
+          </div>
 
-{/* <div className='user_details'>
-  <p>{user && user.email}</p>
-  <IoChevronDownSharp  className='down_arrow'/>
-</div> */}
+          <div className="update_p_inputs">
+            <label htmlFor='title'>Email</label>
+            <input
+              className='update_patient'
+              style={readOnly? {border:"none", textAlign:"right", fontSize:"1em", padding: "0", background: "transparent"} : {}}
+              type='text'
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="update_p_inputs">
+            <label htmlFor='title'>Diagnosis</label>
+            <input
+              className='update_patient'
+              style={readOnly? {border:"none", textAlign:"right", fontSize:"1em", padding: "0", background: "transparent"} : {}}
+              type='text'
+              onChange={(e) => setHealthCondition(e.target.value)}
+              value={healthCondition}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="update_p_inputs">
+            <label htmlFor='title'>Phone Number</label>
+            <input
+              className='update_patient'
+              style={readOnly? {border:"none", textAlign:"right", fontSize:"1em", padding: "0", background: "transparent"} : {}}
+              type='text'
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              value={phoneNumber}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="update_p_inputs">
+            <label htmlFor='title'>Date of Birth</label>
+            <input
+              className='update_patient'
+              style={readOnly? {border:"none", textAlign:"right", fontSize:"1em", padding: "0", background: "transparent", marginRight: "-20px"} : {}}
+              type='date'
+              onChange={(e) => setDob(e.target.value)}
+              value={dob}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="update_p_inputs">
+            <label htmlFor='title'>Gender</label>
+            {readOnly && (gender == "female"? "Female" : "Male") }
+              {!readOnly && 
+            <div className=''>
+              <label htmlFor=''>Male</label>
+              <input
+                className=''
+                type='radio'
+                onChange={(e) => setGender(e.target.value)}
+                value={'male'}
+                checked={gender == "male"}
+                name='gender'
+                readOnly={readOnly}
+                style={{marginRight:"25px"}}
+              />
+
+              <label htmlFor=''>Female</label>
+              <input
+                className=''
+                type='radio'
+                onChange={(e) => setGender(e.target.value)}
+                value={'female'}
+                checked={gender == "female"}
+                name='gender'
+                readOnly={readOnly}
+              />
+            </div>}
+          </div>
+          <div className="update_p_header bottom_u_p">
+            { readOnly && <button type='button' onClick={() => setReadOnly(false)}  title='Update Patient Details'>Update
+            </button>}
+          { !readOnly && <button type='button' onClick={() => cancelUpdate()} className='cancel_update' >Cancel</button>}
+          {!readOnly && <button
+            onClick={handleSubmit}
+            style={isLoading2 ? { cursor: 'wait', background: '#8a8a8a' } : {}}
+            className='save_update_btn'
+          >
+            {isLoading2 ? 'Loading...' : 'Save'}
+          </button>}
+            
+          </div>
+        </form>
+          <hr style={{marginTop:"20px"}}/>
+
+        <section >
+        <div className='update_p_header' style={{marginTop:"20px"}}>
+          <h2>Rx Overview</h2>
+         <button type='button'>Print</button>
+          </div>
+        </section>
+        </div>
+      )}
+    </div>
+  );
+}

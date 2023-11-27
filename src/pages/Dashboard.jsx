@@ -19,11 +19,13 @@ export default function Dashboard(props) {
   const {showAlert} = useContext(AlertContext);
   const [ isLoading, setIsLoading ] = useState(false)
   const [ isError, setIsError ] = useState(false)
+  const [ provider, setProvider ] = useState({})
+
   
   useEffect(()=>{
     const fetchItems = async () => {
       setIsLoading(true)
-      const response = await fetch(`${baseUrl}/health_provider/patients/get_patients/100`, {
+      const response = await fetch(`${baseUrl}/health_provider/profile/get_provider`, {
         headers: {
           'Authorization': `Bearer ${user.data.token}`
         }
@@ -39,7 +41,9 @@ export default function Dashboard(props) {
       }
 
       const json = await response.json();
+      setProvider(json.data)
     }
+
 
 
     if(user){
@@ -48,6 +52,8 @@ export default function Dashboard(props) {
   }
   
   }, [user])
+
+  console.log(provider)
   
   return (
     <div className='home'>
@@ -71,7 +77,7 @@ export default function Dashboard(props) {
         <section className='dash_section'>
           <div className="dashBanner">
             <div className='dash_text'>
-              <h3>Hello, Tope Akinkuade</h3>
+              <h3>Hi, {provider? provider.full_name : "Health Provider"}</h3>
               <p>How was your day?</p>
             </div>
             <img src="/banner_img.svg" alt="" />
@@ -95,7 +101,7 @@ export default function Dashboard(props) {
           </div>
         </section>
       </div>}
-      <SelectedPatient />
+      <SelectedPatient/>
       {/* {items && <h1>Welcome { user && user.username.charAt(0).toUpperCase() + user.username.slice(1)}, You have {items.length > 0? items.length : "no" } {items.length > 1? "items" : "item"} in your list!</h1>}
 
 

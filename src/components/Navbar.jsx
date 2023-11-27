@@ -22,9 +22,9 @@ export default function Navbar(props) {
           <hr />
           <Link to="/reports">Reports</Link>
           <hr />
-          <Link to="/medication">Medication</Link>
-          <hr />
           <Link to="/resources">Resources</Link>
+          <hr />
+          <Link to="/profile">Profile</Link>
         </div>
         <button className='logout_btn' onClick={logout} >Logout <IoLogOutOutline /> </button>
       </nav>

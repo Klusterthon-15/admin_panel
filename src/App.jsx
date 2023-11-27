@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
-import Drugs from './pages/Drugs'
+import Profile from './pages/Profile'
 import Patients from './pages/Patients'
 import Reports from './pages/Reports'
 import Resources from './pages/Resources'
@@ -39,8 +39,8 @@ function App() {
                 element={user ? <Dashboard handleClick={openItemForm} /> : <Landing/>} 
               />
               <Route 
-                path="/medication" 
-                element={user ? <Drugs handleClick={openItemForm} /> : <Landing/>} 
+                path="/profile" 
+                element={user ? <Profile handleClick={openItemForm} /> : <Landing/>} 
               />
               <Route 
                 path="/patients" 

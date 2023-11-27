@@ -9,7 +9,7 @@ import Alert from '../components/Alert';
 import SelectedPatient from '../components/SelectedPatient';
 import { AlertContext } from '../context/AlertContext';
 
-export default function Drugs(props) {
+export default function Profile(props) {
 
   const {items, dispatch} = useItemsContext()
   const { user } = useAuthContext();
