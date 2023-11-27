@@ -12,7 +12,7 @@ export default function Navbar(props) {
         <Link to="/">
           <div className='home_link'>
             <img className="logo" src="/logo.png" alt="" /> 
-            <h1><span>Klust</span>Medics</h1> 
+            <h1>KlustMedics</h1> 
           </div>
         </Link>
         <div className='nav_items'>

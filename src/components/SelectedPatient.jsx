@@ -4,6 +4,9 @@ import { ItemsContext } from '../context/ItemContext';
 import { AlertContext } from '../context/AlertContext';
 import { baseUrl } from '../Data';
 import { MdOutlineErrorOutline } from 'react-icons/md';
+import { IoRemoveCircleOutline } from "react-icons/io5";
+import { FaRegSmileWink } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 export default function SelectedPatient({handleUpdate}) {
   const { patientId } = useContext(ItemsContext);
@@ -12,6 +15,7 @@ export default function SelectedPatient({handleUpdate}) {
   const [isError, setIsError] = useState(false);
   const [patient, setPatient] = useState({});
   const { showAlert } = useContext(AlertContext);
+  const [meds, setMeds] = useState([]);
 
   const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
@@ -21,6 +25,7 @@ export default function SelectedPatient({handleUpdate}) {
   const [gender, setGender] = useState('');
   const [readOnly, setReadOnly] = useState(true);
   const [isLoading2, setIsLoading2] = useState(false);
+  const [isdefault, setisDefault] = useState(true);
 
   useEffect(() => {
     const selectedPatient = JSON.parse(localStorage.getItem('selectedPatient'));
@@ -54,13 +59,42 @@ export default function SelectedPatient({handleUpdate}) {
           showAlert('error', 'An error occurred while fetching patient information');
         }
     };
-    console.log(selectedPatient.data._id, patientId)
+    const fetchMeds = async () => {
+      try {
+          setIsLoading(true);
+          const response = await fetch(`${baseUrl}/patient/medication/get_medication/${patientId}`, {
+            headers: {
+              Authorization: `Bearer ${user.data.token}`,
+            },
+          });
 
-    if (patientId && selectedPatient.data._id !== patientId) {
+          if (response.ok) {
+            const json = await response.json();
+            setMeds(json.data);
+            console.log(json.data)
+            setIsLoading(false);
+            setIsError(false);
+          } 
+        } catch (error) {
+          setIsLoading(false);
+          console.log(error)
+          setIsError(true);
+          showAlert('error', 'An error occurred while fetching patient information');
+        }
+    };
+
+    if(!patientId && !selectedPatient){
+        setisDefault(true)
+    }else{
+      setisDefault(false)
+    }
+
+    if (patientId && selectedPatient?.data._id !== patientId) {
       fetchItems();
+      fetchMeds();
       setReadOnly(true)
-    } else {
-      setPatient(selectedPatient.data)
+    } else if(selectedPatient){
+      setPatient((selectedPatient.data) || {})
       setFullname((selectedPatient.data.full_name) || '');
       setEmail((selectedPatient.data.email) || '');
       setHealthCondition((selectedPatient.data.health_condition) || '');
@@ -153,6 +187,14 @@ export default function SelectedPatient({handleUpdate}) {
           <p>
             Oops! Something went wrong. <br /> Check your Network and try again!
           </p>
+        </div>
+      ) : isdefault ? (
+        <div style={{textAlign:"center"}}>
+          <p className='err_logo'>
+            <FaRegSmileWink/>
+            
+          </p>
+          <p>This panel allows you to manage patient information from anywhere in the application.<br /> <br />Click <Link to={'/patients'}>Here</Link> and select a patient name to get started</p>
         </div>
       ) : (<div className='select_patient_body'>
         <form className='select_patient_form' onSubmit={handleSubmit}>
@@ -266,6 +308,9 @@ export default function SelectedPatient({handleUpdate}) {
           <h2>Rx Overview</h2>
          <button type='button'>Print</button>
           </div>
+          {meds && meds.map(med => <div key={med._id}> <p>{med.name}</p></div>)}
+          {!meds.length && <div style={{textAlign:"center"}}>
+            <p className='err_logo'><IoRemoveCircleOutline  /></p><p>No Medications Added yet</p></div>}
         </section>
         </div>
       )}
