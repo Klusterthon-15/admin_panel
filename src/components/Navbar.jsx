@@ -20,8 +20,6 @@ export default function Navbar(props) {
           <hr />
           <Link to="/patients">Patients</Link>
           <hr />
-          <Link to="/reports">Reports</Link>
-          <hr />
           <Link to="/resources">Resources</Link>
           <hr />
           <Link to="/profile">Profile</Link>

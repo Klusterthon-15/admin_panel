@@ -53,7 +53,6 @@ export default function Dashboard(props) {
   
   }, [user])
 
-  console.log(provider)
   
   return (
     <div className='home'>
@@ -96,25 +95,9 @@ export default function Dashboard(props) {
               <p className='stat_small'>Add Patient</p>
             </div>
           </div>
-          <div className='dash_report'>
-
-          </div>
         </section>
       </div>}
       <SelectedPatient/>
-      {/* {items && <h1>Welcome { user && user.username.charAt(0).toUpperCase() + user.username.slice(1)}, You have {items.length > 0? items.length : "no" } {items.length > 1? "items" : "item"} in your list!</h1>}
-
-
-        <div className="items_wrapper">
-         {items && items.map((item) => (<Item key={item._id} item={item}/>))}
-
-          {(items && items.length == 0)? 
-          <div className='empty_list'>
-            <img src='/void2.png' alt='no results'/> 
-          </div>: ""}
-            
-          {items && <button onClick={props.handleClick} className='add_item_btn in_wrapper' style={(items.length == 0)? {} : {float: "right", margin:"0"}}>Add a new Item <HiPlus className='plus_icon'/> </button> }
-        </div> */}
     </div>
   )
 }
